@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meu Treino">
+<meta name="theme-color" content="#0f0f13">
+<title>Meu Treino</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a24;
+    --border: #22222e;
+    --text: #e8e8f0;
+    --muted: #555;
+    --subtle: #888;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* HEADER */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 20px 16px;
+    text-align: center;
+  }
+  .header-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .header-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 14px 16px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    flex-shrink: 0;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.2s;
+    background: var(--surface);
+    color: var(--subtle);
+  }
+  .tab.active {
+    color: #000;
+  }
+
+  /* DAY CARD */
+  .day-card {
+    margin: 0 16px 12px;
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 20px;
+    border-left: 4px solid transparent;
+  }
+  .day-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .day-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .day-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .day-count {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .day-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  /* PROGRESS */
+  .progress-wrap { margin-top: 16px; }
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .progress-text-left {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .progress-text-right {
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .progress-bar-bg {
+    background: var(--bg);
+    border-radius: 8px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.4s ease;
+  }
+
+  /* EXERCISE LIST */
+  .exercises { padding: 0 16px; }
+
+  .ex-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .ex-item.done {
+    opacity: 0.65;
+  }
+
+  .check-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .ex-body { flex: 1; min-width: 0; }
+  .ex-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .ex-item.done .ex-name {
+    text-decoration: line-through;
+    color: var(--subtle);
+  }
+  .ex-desc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .ex-sets {
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  /* TIP */
+  .tip-box {
+    margin: 12px 16px 40px;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px 16px;
+    border-top: 3px solid transparent;
+  }
+  .tip-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .tip-text {
+    font-size: 12px;
+    color: var(--subtle);
+    line-height: 1.7;
+  }
+
+  /* INSTALL BANNER */
+  .install-banner {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #1a1a24;
+    border-top: 1px solid #2a2a3a;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    z-index: 200;
+    animation: slideUp 0.4s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .install-text { font-size: 13px; color: #bbb; flex: 1; }
+  .install-text strong { color: #fff; }
+  .install-btn {
+    background: #00C9A7;
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .install-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Programa de Treino</div>
+  <div class="header-title">Semana de Treino 💪</div>
+  <div class="header-sub">~1h20 por sessão · sem cardio incluído</div>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div id="main"></div>
+
+<div class="install-banner" id="installBanner" style="display:none">
+  <div class="install-text"><strong>Salvar como app?</strong><br>Toque no botão ao lado ➜</div>
+  <button class="install-btn" id="installBtn">Instalar</button>
+  <button class="install-close" id="installClose">×</button>
+</div>
+
+<script>
+const DIAS = [
+  {
+    dia: 1, foco: "Dorsal & Bíceps", cor: "#00C9A7", icon: "💪",
+    exercicios: [
+      { nome: "Remada curvada com barra", series: "4", reps: "10–12", desc: "Pegada pronada, costas neutras" },
+      { nome: "Puxada frontal na polia", series: "4", reps: "10–12", desc: "Pegada aberta, tração até o peitoral" },
+      { nome: "Remada unilateral com haltere", series: "3", reps: "12 cada", desc: "Cotovelo próximo ao corpo" },
+      { nome: "Puxada na polia (pegada neutra)", series: "3", reps: "12", desc: "Variação para enfatizar bíceps" },
+      { nome: "Remada baixa na polia", series: "3", reps: "12", desc: "Postura ereta, puxar pelo cotovelo" },
+      { nome: "Rosca direta com barra", series: "4", reps: "10–12", desc: "Movimento controlado, sem balanço" },
+      { nome: "Rosca alternada com haltere", series: "3", reps: "12 cada", desc: "Supinação no topo" },
+      { nome: "Rosca martelo", series: "3", reps: "12 cada", desc: "Trabalha bíceps braquial e braquiorradial" },
+    ],
+    dica: "Descanso: 60–90s entre séries. Foco em contração total na dorsal antes de puxar com bíceps.",
+  },
+  {
+    dia: 2, foco: "Quadríceps & Abdômen", cor: "#FF6B6B", icon: "🦵",
+    exercicios: [
+      { nome: "Agachamento livre", series: "4", reps: "10–12", desc: "Joelhos alinhados, descer até 90°" },
+      { nome: "Leg press 45°", series: "4", reps: "12–15", desc: "Pés paralelos, largura dos ombros" },
+      { nome: "Cadeira extensora", series: "3", reps: "15", desc: "Fase excêntrica lenta (3s)" },
+      { nome: "Agachamento sumô com haltere", series: "3", reps: "12–15", desc: "Pés abertos, ênfase na parte interna" },
+      { nome: "Avanço com passada", series: "3", reps: "12 cada", desc: "Passo largo, joelho traseiro roza o chão" },
+      { nome: "Prancha abdominal", series: "4", reps: "45–60s", desc: "Quadril neutro, core ativado" },
+      { nome: "Crunch na polia alta", series: "3", reps: "15–20", desc: "Contração máxima no topo" },
+      { nome: "Elevação de pernas suspensa", series: "3", reps: "15", desc: "Controlar a descida" },
+      { nome: "Oblíquo com rotação (medicine ball)", series: "3", reps: "15 cada", desc: "Rotação controlada de tronco" },
+    ],
+    dica: "Descanso: 90s nos compostos, 60s no abdômen. Mantenha o core sempre ativado nos agachamentos.",
+  },
+  {
+    dia: 3, foco: "Peito & Tríceps", cor: "#4ECDC4", icon: "🏋️",
+    exercicios: [
+      { nome: "Supino reto com barra", series: "4", reps: "8–10", desc: "Descida controlada até o peito" },
+      { nome: "Supino inclinado com haltere", series: "4", reps: "10–12", desc: "Ênfase na parte superior do peitoral" },
+      { nome: "Crucifixo com haltere (banco plano)", series: "3", reps: "12", desc: "Leve flexão do cotovelo, amplitude total" },
+      { nome: "Crossover na polia alta", series: "3", reps: "12–15", desc: "Cruzar as mãos na frente do corpo" },
+      { nome: "Flexão declinada", series: "3", reps: "15", desc: "Pés elevados, ênfase no peitoral inferior" },
+      { nome: "Tríceps testa com barra EZ", series: "4", reps: "10–12", desc: "Cotovelos fixos, baixar até a testa" },
+      { nome: "Tríceps polia (corda)", series: "3", reps: "12–15", desc: "Abrir a corda no final do movimento" },
+      { nome: "Tríceps mergulho entre bancos", series: "3", reps: "15", desc: "Corpo vertical, cotovelos para trás" },
+    ],
+    dica: "Descanso: 90s nos compostos, 60s nos isolados. Aqueça bem o ombro antes do supino.",
+  },
+  {
+    dia: 4, foco: "Posterior & Glúteo", cor: "#A78BFA", icon: "🍑",
+    exercicios: [
+      { nome: "Levantamento terra romeno", series: "4", reps: "10–12", desc: "Costas retas, sentir o alongamento do posterior" },
+      { nome: "Cadeira flexora", series: "4", reps: "12–15", desc: "Fase excêntrica lenta" },
+      { nome: "Stiff com halteres", series: "3", reps: "12", desc: "Quadril para trás, menos flexão do joelho" },
+      { nome: "Agachamento búlgaro", series: "3", reps: "12 cada", desc: "Pé traseiro elevado, ênfase no glúteo" },
+      { nome: "Hip thrust com barra", series: "4", reps: "12–15", desc: "Extensão completa do quadril no topo" },
+      { nome: "Abdução de quadril na polia baixa", series: "3", reps: "15 cada", desc: "Glúteo médio ativado" },
+      { nome: "Elevação pélvica unilateral", series: "3", reps: "15 cada", desc: "Controlar descida, não tocar o chão" },
+    ],
+    dica: "Descanso: 90–120s nos compostos. Ative conscientemente o glúteo em todos os movimentos.",
+  },
+  {
+    dia: 5, foco: "Ombro & Abdômen", cor: "#F59E0B", icon: "🔥",
+    exercicios: [
+      { nome: "Desenvolvimento com halteres", series: "4", reps: "10–12", desc: "Amplitude completa, não trancar os cotovelos" },
+      { nome: "Elevação lateral com haltere", series: "4", reps: "12–15", desc: "Cotovelo levemente flexionado, pausa no topo" },
+      { nome: "Elevação frontal com disco", series: "3", reps: "12", desc: "Alternado, controlar a descida" },
+      { nome: "Remada alta com barra", series: "3", reps: "12", desc: "Puxar pelos cotovelos, acima do queixo" },
+      { nome: "Crucifixo invertido (voador inverso)", series: "3", reps: "15", desc: "Tronco inclinado, ênfase no deltóide posterior" },
+      { nome: "Prancha lateral", series: "3", reps: "40s cada", desc: "Quadril elevado, alinhamento total" },
+      { nome: "Dead bug", series: "3", reps: "12 cada", desc: "Lombar colada no chão durante todo o movimento" },
+      { nome: "Crunch bicicleta", series: "3", reps: "20", desc: "Rotação controlada, sem puxar o pescoço" },
+      { nome: "Rollout com roda abdominal", series: "3", reps: "10–12", desc: "Avançar até o limite do controle" },
+    ],
+    dica: "Descanso: 60–90s entre séries. Evite usar trapézio na elevação lateral — sinta o deltóide.",
+  },
+];
+
+let diaAtivo = 0;
+// Load saved state from localStorage
+let concluidos = JSON.parse(localStorage.getItem('treino_concluidos') || '{}');
+
+function salvar() {
+  localStorage.setItem('treino_concluidos', JSON.stringify(concluidos));
+}
+
+function renderTabs() {
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = DIAS.map((d, i) => `
+    <button class="tab ${i === diaAtivo ? 'active' : ''}" 
+      style="${i === diaAtivo ? `background:${d.cor};box-shadow:0 4px 20px ${d.cor}55` : ''}"
+      onclick="trocarDia(${i})">${d.icon} Dia ${d.dia}</button>
+  `).join('');
+}
+
+function renderMain() {
+  const d = DIAS[diaAtivo];
+  const total = d.exercicios.length;
+  const feitos = d.exercicios.filter((_, i) => concluidos[`${diaAtivo}-${i}`]).length;
+  const pct = Math.round((feitos / total) * 100);
+
+  document.getElementById('main').innerHTML = `
+    <div class="day-card" style="border-left-color:${d.cor}">
+      <div class="day-card-top">
+        <div>
+          <div class="day-label" style="color:${d.cor}">Dia ${d.dia}</div>
+          <div class="day-title">${d.foco}</div>
+          <div class="day-count">${total} exercícios · ${feitos} concluídos</div>
+        </div>
+        <div class="day-icon" style="background:${d.cor}18;border:2px solid ${d.cor}44">${d.icon}</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-row">
+          <span class="progress-text-left">Progresso</span>
+          <span class="progress-text-right" style="color:${d.cor}">${pct}%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width:${pct}%;background:${d.cor};box-shadow:0 0 10px ${d.cor}88"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercises">
+      ${d.exercicios.map((ex, i) => {
+        const done = !!concluidos[`${diaAtivo}-${i}`];
+        return `
+        <div class="ex-item ${done ? 'done' : ''}" 
+          style="${done ? `background:${d.cor}18;border-color:${d.cor}55` : ''}"
+          onclick="toggle(${i})">
+          <div class="check-circle" style="border-color:${done ? d.cor : '#333'};background:${done ? d.cor : 'transparent'}">
+            ${done ? '✓' : ''}
+          </div>
+          <div class="ex-body">
+            <div class="ex-name">${ex.nome}</div>
+            <div class="ex-desc">${ex.desc}</div>
+          </div>
+          <div class="ex-sets" style="color:${d.cor}">${ex.series}×${ex.reps}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="tip-box" style="border-top-color:${d.cor}">
+      <div class="tip-label" style="color:${d.cor}">💡 Dica do Treino</div>
+      <div class="tip-text">${d.dica}</div>
+    </div>
+  `;
+}
+
+function render() {
+  renderTabs();
+  renderMain();
+}
+
+function trocarDia(i) {
+  diaAtivo = i;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggle(idx) {
+  const key = `${diaAtivo}-${idx}`;
+  concluidos[key] = !concluidos[key];
+  salvar();
+  render();
+}
+
+// PWA Install prompt
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').style.display = 'flex';
+});
+
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('installBanner').style.display = 'none';
+  }
+});
+
+document.getElementById('installClose').addEventListener('click', () => {
+  document.getElementById('installBanner').style.display = 'none';
+});
+
+// iOS: show manual instructions after 3s if not Android
+setTimeout(() => {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  if (isIOS && !isStandalone && !deferredPrompt) {
+    document.getElementById('installBanner').style.display = 'flex';
+    document.getElementById('installBtn').textContent = 'Como instalar?';
+    document.getElementById('installBtn').onclick = () => {
+      alert('No Safari:\n1. Toque no ícone de compartilhar (⬆)\n2. Role e toque em "Adicionar à Tela Início"\n3. Toque em "Adicionar"');
+    };
+  }
+}, 2000);
+
+render();
+</script>
+</body>
+</html>
